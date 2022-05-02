@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  env: {
+    SERVER_URL: "https://pdp-fastfood.herokuapp.com/"
+  }
 }
 
 module.exports = nextConfig
