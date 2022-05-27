@@ -1,3 +1,44 @@
 body{
 
 }
+#__next{
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f2f2f2;
+}
+.login{
+  background: url("/icons/login.png") no-repeat;
+  background-position-x: -50px;
+  background-position-y: -100px;
+}
+.form-control{
+  background-color: transparent!important;
+  color: black;
+  &:focus{
+    background-color: transparent!important;
+  }
+}
+
+.full-screen{
+  width: 100vw;
+  height: 100vh;
+}
+input:-webkit-autofill {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: black;
+}
+.ava{
+  border-radius: 50%;
+  overflow: hidden;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid black;
+  img{
+    width: 80%;
+    height: 80%;
+  }
+}
