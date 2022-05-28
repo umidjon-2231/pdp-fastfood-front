@@ -11,23 +11,30 @@ export default function Home() {
 
     useEffect(() => {
         async function fetchData(){
-            let token=localStorage.getItem("token")
-            if(!token){
-                token=getCookie("token")
-            }
-            if (token) {
-                const req=await fetch(process.env.SERVER_URL+"auth/token/check",{
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer "+token
-                    }
-                })
-                const data=await req.json()
-                if(data.success){
-                    await router.push("/orders")
+            try {
+                let token=localStorage.getItem("token")
+                if(!token){
+                    token=getCookie("token")
                 }
+                console.log(token)
+                if (token) {
+                    const req=await fetch(process.env.SERVER_URL+"auth/token/check",{
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer "+token
+                        }
+                    })
+                    const data=await req.json()
+                    if(data.success===true){
+                        await router.push("/orders")
+                    }
+                }
+            }catch (e) {
+                localStorage.removeItem("token")
+                console.log(e)
             }
+
         }
         fetchData().then(() => {
             setLoading(false)
