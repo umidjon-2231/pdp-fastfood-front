@@ -36,11 +36,7 @@ input:-webkit-autofill {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid black;
-  img{
-    width: 100%;
-    height: 100%;
-  }
+  //box-shadow: 0 0 5px black;
 }
 
 .left{
@@ -76,4 +72,161 @@ input:-webkit-autofill {
 
 .main{
   width: calc(100vw - 300px);
+  .body{
+    width: 100%;
+    overflow-y: auto;
+  }
+}
+
+.plus{
+  cursor: pointer;
+  background: #20D472;
+  border-radius: 50%;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  &:after{
+    content: '';
+    position: absolute;
+    background-color: white;
+    width: 14px;
+    height: 1px;
+    left: 11px;
+    top: 18px;
+  }
+  &:before{
+    position: absolute;
+    content: '';
+    background-color: white;
+    width: 1px;
+    height: 14px;
+    top: 11px;
+    left: 18px;
+  }
+}
+
+.size-12{
+  font-size: 12px;
+}
+.size-14{
+  font-size: 14px;
+  font-weight: 500;
+}
+.size-20{
+  font-size: 20px;
+}
+
+.text-muted{
+  color: #8D9BA8;
+}
+
+
+.scroll-nav{
+  border-radius: 24px;
+  height: 48px;
+  width: 100%;
+  background: #EDEFF3;
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  justify-content: space-between;
+  position: relative;
+  &.disabled{
+    &:after{
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      content: '';
+      background: white;
+      opacity: 0.6;
+    }
+  }
+  .item{
+    color: #2D3A45;
+    opacity: 0.4;
+    height: 100%;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    &.active{
+      opacity: 1;
+      border-radius: 24px;
+      background-color: white;
+      .rectangle{
+        background: #8D9BA8;
+      }
+    }
+  }
+}
+
+.rectangle{
+  height: 6px;
+  border-radius: 2px;
+  border: 1px solid #8D9BA8;
+  background: transparent;
+}
+
+.order-horizontal{
+  background: white;
+  border-radius: 6px;
+  padding: 20px 36px;
+  transition: all ease-in 0.5s;
+  display: flex;
+  .order-head{
+    border-right: 2px solid #EDEFF3;
+    padding-right: 80px;
+  }
+
+  .order-amount{
+    padding: 0 34px;
+    border-right: 2px solid #EDEFF3;
+  }
+
+  .order-client{
+    padding: 0 34px;
+    border-right: 2px solid #EDEFF3;
+  }
+  .order-position{
+    padding: 0 34px;
+  }
+  &:hover{
+    box-shadow: 0 20px 25px rgba(176, 177, 181, 0.432802);
+  }
+
+}
+
+
+.order-id{
+  background: #20D472;
+  border-radius: 18px;
+  padding: 10px 19px;
+  color: white;
+  width: 90px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-time{
+  font-size: 20px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.payType{
+  position: relative;
+  &:after{
+    position: absolute;
+    border-radius: 50%;
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #14E5E4;
+    left: -15px;
+    top: 3px;
+  }
 }

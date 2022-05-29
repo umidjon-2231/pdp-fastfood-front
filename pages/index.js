@@ -4,6 +4,7 @@ import {toast} from "react-toastify";
 import {useRouter} from "next/router";
 import {getCookie, setCookie} from "../tools";
 import Loading from "../components/Loading";
+import Title from "../components/Title";
 
 export default function Home() {
     const [loading, setLoading]=useState(true)
@@ -16,7 +17,6 @@ export default function Home() {
                 if(!token){
                     token=getCookie("token")
                 }
-                console.log(token)
                 if (token) {
                     const req=await fetch(process.env.SERVER_URL+"auth/token/check",{
                         method: "GET",
@@ -73,6 +73,7 @@ export default function Home() {
 
     return (
         <>
+            <Title name="PDP fastfood"/>
             <Loading active={loading} opacity={opacity}/>
             <div className="login full-screen">
                 <div className="container h-100" >

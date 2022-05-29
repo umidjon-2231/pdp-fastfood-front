@@ -50,7 +50,8 @@ export async function checkToken(ctx) {
             const res=req.data
             return {
                 props: {
-                    user: res.data
+                    user: res.data,
+                    token
                 },
                 success: true
             }
@@ -66,4 +67,10 @@ export async function checkToken(ctx) {
     }
 
     return {success: false}
+}
+
+export function parseTime(time) {
+    let date = new Date(time);
+    date.setHours(date.getHours()+5)
+    return date
 }

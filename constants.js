@@ -1,0 +1,3 @@
+export const ORDER_STATUS={
+    NEW: 'NEW', CLOSED: 'CLOSED', SENT: 'SENT', ACCEPTED: 'ACCEPTED'
+}
