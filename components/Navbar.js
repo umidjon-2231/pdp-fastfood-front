@@ -83,15 +83,14 @@ const Navbar = ({children, name, user, loader=false}) => {
                 <div className="menu">
                     {menu.map((item, index)=>{
                         return (
-                            <div key={index} className={`item d-flex align-items-center
+                            <div onClick={()=>{router.push('/'+item.name)}}
+                                 key={index} className={`item d-flex align-items-center
                                                 ${name===item.name?'active':''} ps-5 py-2`}>
                                 <div className="h-100 d-flex align-items-center">
                                     <img src={name===item.name?item.activeIcon:item.icon} alt="" width={16}/>
                                 </div>
                                 <div className="ms-3">
-                                    <p className='my-2' onClick={()=>{
-                                        router.push('/'+item.name)
-                                    }}>{item.title}</p>
+                                    <p className='my-2'>{item.title}</p>
                                 </div>
 
                             </div>

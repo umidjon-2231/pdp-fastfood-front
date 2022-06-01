@@ -5,17 +5,43 @@ import * as process from "../next.config";
 import {toast} from "react-toastify";
 import Image from "next/image";
 import {ORDER_STATUS} from "../constants";
+import {useRouter} from "next/router";
 
 const Orders = ({user, token}) => {
     const [loading, setLoading]=useState(true)
     const [orders, setOrders]=useState([])
     const [activeStatus, setActiveStatus]=useState(ORDER_STATUS.NEW)
     const [horizontal, setHorizontal]=useState(true)
+    const [update, setUpdate]=useState(false)
+    const router=useRouter()
     useEffect(()=>{
-        getOrderByStatus(activeStatus).catch((e)=>{
-            console.log(e)
+        connectWebSocket().then(()=>{
+            getOrderByStatus(activeStatus).catch((e)=>{
+                console.log(e)
+            })
         })
+
     }, [])
+
+    useEffect(()=>{
+        changeOrderPosition(horizontal).then(()=>{
+            console.log("Order list updated")
+        })
+    }, [update])
+
+    async function connectWebSocket(){
+        let socket = new SockJS(process.env.SERVER_URL+'ws');
+        const stompClient = Stomp.over(socket)
+
+        await stompClient.connect({}, ()=>{
+            console.log("connected")
+            stompClient.subscribe("/update/order", (res)=>{
+                setUpdate(u=>!u)
+            })
+        }, (e)=>{
+            toast.error("Something went wrong. Try to reload page or check your internet connection")
+        })
+    }
 
     async function getAllOrders(){
         setLoading(true)
@@ -28,8 +54,13 @@ const Orders = ({user, token}) => {
         if(req.status===200){
             const data=await req.json()
             setOrders(data)
-            console.log(data)
-        }else {
+            console.log("Success get all orders")
+        }
+        else if(req.status===403){
+            toast.warn("Your token expired")
+            await router.push("/")
+        }
+        else {
             toast.error('Something went wrong')
         }
         setLoading(false)
@@ -37,25 +68,32 @@ const Orders = ({user, token}) => {
 
     async function getOrderByStatus(status) {
         setLoading(true)
-        const req=await fetch(process.env.SERVER_URL+'order?page=0&size=20&desc=true&status='+status, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer '+token
+        try {
+            const req=await fetch(process.env.SERVER_URL+'order?page=0&size=20&desc=true&status='+status, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer '+token
+                }
+            })
+            if(req.status===200){
+                const data=await req.json()
+                setOrders(data)
+                console.log("Success get order by status")
+            }else if(req.status===403){
+                toast.warn("Your token expired")
+                await router.push("/")
             }
-        })
-        if(req.status===200){
-            const data=await req.json()
-            setOrders(data)
-            console.log(data)
-        }else {
-            toast.error('Something went wrong')
+            else {
+                toast.error('Something went wrong')
+            }
+        }catch (e) {
+            toast.error("Something went wrong. Check your internet connection")
         }
+
         setLoading(false)
     }
+
     async function changeActiveStatus(status) {
-        // if(status===activeStatus){
-        //     return;
-        // }
         setActiveStatus(status)
         await getOrderByStatus(status)
     }
@@ -65,9 +103,10 @@ const Orders = ({user, token}) => {
         if(isHorizontal){
             await changeActiveStatus(activeStatus)
         }else {
-
+            await getAllOrders()
         }
     }
+
 
 
     return (
@@ -118,11 +157,9 @@ const Orders = ({user, token}) => {
 
                         </div>
                     </div>
-
-
                 </div>
                 <div className="py-3 px-4 body" style={{height: 'calc(100vh - 80px)'}}>
-                    {orders.map((item, index)=>{
+                    {orders?.map((item, index)=>{
                         return(
                             <div key={index} className={`mb-2 order-${horizontal?'horizontal':'vertical'}`}>
                                 <div className={'order-head'}>
@@ -131,7 +168,8 @@ const Orders = ({user, token}) => {
                                     </div>
                                     <hr/>
                                     <div className='order-time'>
-                                        <img src="/icons/clock.png" className='me-2' alt="" width={16}/>
+                                        <img src="/icons/clock.png" className='me-2' alt="clock"
+                                               width={16}/>
                                         {parseTime(item.time).toLocaleTimeString().slice(0,5)}
                                     </div>
                                 </div>
@@ -186,6 +224,12 @@ const Orders = ({user, token}) => {
                             </div>
                         )
                     })}
+                    {!orders||orders?.length===0?
+                        <div className="d-flex justify-content-center">
+                            <div onClick={connectWebSocket} className="no-data">No data</div>
+                        </div>
+
+                        :''}
                 </div>
             </div>
 

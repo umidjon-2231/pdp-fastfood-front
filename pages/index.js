@@ -24,7 +24,9 @@ export default function Home() {
                             "Content-Type": "application/json",
                             "Authorization": "Bearer "+token
                         }
-                    })
+                    }).catch((e)=>{
+                        toast.error("Something went wrong. Check your internet connection")
+                        })
                     const data=await req.json()
                     if(data.success===true){
                         await router.push("/orders")

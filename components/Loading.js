@@ -15,9 +15,12 @@ const Loading = ({active, opacity, fullScreen=true}) => {
                 top: 0,
                 bottom: 0
             }}>
-                <Head>
-                    <title>Loading...</title>
-                </Head>
+                {!opacity?
+                    <Head>
+                        <title>Loading...</title>
+                    </Head>:''
+                }
+
                 <FadeLoader color='#20D472'/>
             </div>
         );
