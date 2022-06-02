@@ -25,7 +25,7 @@ export default function Home() {
                             "Authorization": "Bearer "+token
                         }
                     }).catch((e)=>{
-                        toast.error("Something went wrong. Check your internet connection")
+                        toast.error("Something went wrong. Please, check your internet connection")
                         })
                     const data=await req.json()
                     if(data.success===true){
@@ -59,6 +59,8 @@ export default function Home() {
             headers: {
                 "Content-Type": "application/json"
             }
+        }).catch(()=>{
+            toast.error("Something went wrong. Please, check your internet connection")
         })
         const res = await req.json()
         if (req.status === 200) {

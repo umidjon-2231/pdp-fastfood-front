@@ -28,6 +28,11 @@ export function getCookie(cname) {
     return null;
 }
 
+
+export function getToken() {
+    return localStorage?.getItem("token")??getCookie("token")??""
+}
+
 export async function checkToken(ctx) {
     try {
         let token=''
