@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useDebugValue, useEffect, useState} from 'react';
 import Navbar from "../components/Navbar";
-import {checkToken, getToken, parseTime} from "../tools";
+import {checkToken, getToken, parseTime, webSocketConnection} from "../tools";
 import * as process from "../next.config";
 import {toast} from "react-toastify";
 import {ORDER_STATUS} from "../constants";
 import {useRouter} from "next/router";
+import WebSocket from "../components/WebSocket";
+
 
 const Orders = ({user}) => {
     const [loading, setLoading] = useState(true)
@@ -12,17 +14,14 @@ const Orders = ({user}) => {
     const [activeStatus, setActiveStatus] = useState(ORDER_STATUS.NEW)
     const [horizontal, setHorizontal] = useState(true)
     const [update, setUpdate] = useState(false)
+    useDebugValue(horizontal?"Horizontal":"Vertical")
     const router = useRouter()
     useEffect(() => {
-        connectWebSocket()
-            .then(() => {
-                getOrderByStatus(activeStatus).catch((e) => {
-                    console.log(e)
-                })
-            })
-
-
+        getOrderByStatus(activeStatus).catch((e) => {
+            console.log(e)
+        })
     }, [])
+
 
     useEffect(() => {
         changeOrderPosition(horizontal).then(() => {
@@ -30,17 +29,7 @@ const Orders = ({user}) => {
         })
     }, [update])
 
-    async function connectWebSocket() {
-        let socket = new SockJS(process.env.SERVER_URL + 'ws');
-        const stompClient = Stomp.over(socket)
-        stompClient.connect({
-            Authorization: getToken()
-        }, () => {
-            stompClient.subscribe("/update/order", (res) => {
-                setUpdate(u => !u)
-            })
-        }, errorConnectionToast)
-    }
+
 
     function errorConnectionToast() {
         if (!toast.isActive("error_connection")) {
@@ -103,18 +92,38 @@ const Orders = ({user}) => {
         await getOrderByStatus(status)
     }
 
-    async function changeOrderPosition(isHorizontal = true) {
+    async function changeOrderPosition(isHorizontal = true, status=activeStatus) {
         setHorizontal(isHorizontal)
         if (isHorizontal) {
-            await changeActiveStatus(activeStatus)
+            await changeActiveStatus(status)
         } else {
             await getAllOrders()
         }
     }
 
-
     return (
         <Navbar loader={loading} name="orders" user={user}>
+            <WebSocket errorCallback={errorConnectionToast}
+                       props={{activeStatus, horizontal}}
+                       subscribes={[
+                           {
+                               url: "/update/order",
+                               callback: (res, props)=>{
+                                   let body=JSON.parse(res.body)
+                                   if(body?.type==='CREATE'){
+                                       if(body.status!==props.activeStatus){
+                                           return;
+                                       }
+                                   }else if (body?.type==='UPDATE'){
+                                       if(body?.oldStatus!==props.activeStatus && body?.status!==props.activeStatus){
+                                           return
+                                       }
+                                   }
+                                   changeOrderPosition(props.horizontal, props.activeStatus)
+
+                               }}
+                       ]}
+            />
             <div className="ps-1">
                 <div className='top-nav d-flex align-items-center'>
                     <div className='bg-white d-flex align-items-center px-4 py-3'
@@ -245,7 +254,7 @@ const Orders = ({user}) => {
                     })}
                     {!orders || orders?.length === 0 ?
                         <div className="d-flex justify-content-center">
-                            <div onClick={connectWebSocket} className="no-data">No data</div>
+                            <div className="no-data">No data</div>
                         </div>
 
                         : ''}

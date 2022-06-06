@@ -11,7 +11,6 @@ export function setCookie(cname, cvalue, maxAge) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-
 export function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -27,7 +26,6 @@ export function getCookie(cname) {
     }
     return null;
 }
-
 
 export function getToken() {
     return localStorage?.getItem("token")??getCookie("token")??""
@@ -78,4 +76,27 @@ export function parseTime(time) {
     let date = new Date(time);
     date.setHours(date.getHours()+5)
     return date
+}
+
+
+function sleep( ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function webSocketConnection(errorCallback, headers={}) {
+    let socket = new SockJS(process.env.SERVER_URL + 'ws');
+    const stompClient = Stomp.over(socket)
+    if(process.env.profile==="prod"){
+        stompClient.debug=false
+    }
+    stompClient.connect({
+        Authorization: getToken(),
+        ...headers
+    }, ()=>{
+    }, errorCallback)
+    if(!stompClient.connected){
+        await sleep(1000)
+    }
+    return stompClient
+
 }
