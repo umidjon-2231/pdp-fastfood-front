@@ -1,5 +1,4 @@
 import axios from "axios";
-import * as process from "./next.config";
 
 export function setCookie(cname, cvalue, maxAge) {
     const d = new Date();
@@ -86,6 +85,7 @@ function sleep( ms) {
 export async function webSocketConnection(errorCallback, headers={}) {
     let socket = new SockJS(process.env.SERVER_URL + 'ws');
     const stompClient = Stomp.over(socket)
+    console.log(process.env.profile)
     if(process.env.profile==="prod"){
         stompClient.debug=false
     }
