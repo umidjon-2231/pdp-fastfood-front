@@ -18,23 +18,24 @@ export default function Home() {
                     token=getCookie("token")
                 }
                 if (token) {
-                    const req=await fetch(process.env.SERVER_URL+"auth/token/check",{
+                    const req=await fetch(process.env.NEXT_PUBLIC_SERVER_URL+"auth/token/check",{
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
                             "Authorization": "Bearer "+token
                         }
-                    }).catch((e)=>{
-                        toast.error("Something went wrong. Please, check your internet connection")
-                        })
-                    const data=await req.json()
-                    if(data.success===true){
-                        await router.push("/orders")
+                    })
+                    if(req.status===200){
+                        const data=await req.json()
+                        if(data.success===true){
+                            await router.push("/orders")
+                        }
                     }
+
                 }
             }catch (e) {
+                toast.error("Something went wrong. Please, check your internet connection")
                 localStorage.removeItem("token")
-                console.log(e)
             }
 
         }
@@ -50,29 +51,37 @@ export default function Home() {
     const login = async (e, v) => {
         setOpacity(true)
         setLoading(true)
-        const req = await fetch(process.env.SERVER_URL + "auth/token/get", {
-            body: JSON.stringify({
-                login: v.number,
-                password: v.password
-            }),
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
+        try{
+            const req = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + "auth/token/get", {
+                body: JSON.stringify({
+                    login: v.number,
+                    password: v.password
+                }),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).catch(()=>{
+                toast.error("Something went wrong. Please, check your internet connection")
+            })
+            const res = await req.json()
+            if (req.status === 200) {
+                localStorage.setItem("token", res.token)
+                setCookie("token", res.token, 7200)
+                toast.success("Success authenticated!")
+                await router.push("/orders")
+            } else {
+                toast.error(res["message"] ? res.message : "Something went wrong")
             }
-        }).catch(()=>{
-            toast.error("Something went wrong. Please, check your internet connection")
-        })
-        const res = await req.json()
-        if (req.status === 200) {
-            localStorage.setItem("token", res.token)
-            setCookie("token", res.token, 7200)
-            toast.success("Success authenticated!")
-            await router.push("/orders")
-        } else {
-            toast.error(res["message"] ? res.message : "Something went wrong")
+        }catch (e) {
+            if(!toast.isActive("unknown_error")){
+                toast.error("Something went wrong. Please check your connection!", {
+                    toastId: "unknown_error"
+                })
+            }
+
         }
         setLoading(false)
-
     }
 
     return (

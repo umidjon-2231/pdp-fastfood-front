@@ -178,8 +178,13 @@ input:-webkit-autofill {
   }
 
   .order-amount{
-    padding: 0 34px;
+    padding: 0 110px 0 34px;
     border-right: 2px solid #EDEFF3;
+    position: relative;
+    .payType-box{
+      top: 37px;
+      right: 38px;
+    }
   }
 
   .order-client{
@@ -195,7 +200,50 @@ input:-webkit-autofill {
 
 }
 
+.order-vertical{
+  width: 25%;
+  background: white;
+  border-radius: 6px;
+  padding: 18px 16px;
+  transition: all ease-in 0.5s;
+  .order-head{
+    border-bottom: 2px solid #EDEFF3;
+    padding-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    .order-id{
+      font-size: 14px;
+      width: 60px;
+      height: 30px;
+      padding: 7px 12px;
+    }
+    .order-time{
+      font-size: 14px;
+    }
+  }
 
+  .order-amount{
+    //padding: 34px 0;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #EDEFF3;
+    position: relative;
+    .payType-box{
+      top: 0px;
+      right: 17px;
+    }
+  }
+
+  .order-client{
+    padding: 17px 0;
+  }
+  .order-position{
+    padding: 13px 0;
+  }
+  &:hover{
+    box-shadow: 0 20px 25px rgba(176, 177, 181, 0.432802);
+  }
+
+}
 .order-id{
   background: #20D472;
   border-radius: 18px;
@@ -215,19 +263,25 @@ input:-webkit-autofill {
   align-items: center;
   justify-content: center;
 }
-.payType{
-  position: relative;
-  &:after{
-    position: absolute;
-    border-radius: 50%;
-    content: '';
-    width: 10px;
-    height: 10px;
-    background: #14E5E4;
-    left: -15px;
-    top: 3px;
+.payType-box{
+  position: absolute;
+  right: 0;
+  top: 0;
+  .payType{
+    position: relative;
+    &:after{
+      position: absolute;
+      border-radius: 50%;
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: #14E5E4;
+      left: -15px;
+      top: 3px;
+    }
   }
 }
+
 
 .no-data{
   display: inline;

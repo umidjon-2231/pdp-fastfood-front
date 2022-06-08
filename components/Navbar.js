@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {NextConfig as process} from "next/dist/server/config-shared";
 import {useRouter} from "next/router";
 import Image from "next/image";
 import Loading from "./Loading";
@@ -74,7 +73,7 @@ const Navbar = ({children, name, user, loader=false}) => {
             <div className="left">
                 <div className="header px-3 pt-4 pb-5 d-flex align-items-center">
                     <div className="ava">
-                        <Image width={50} height={50} src={process.env.SERVER_HOST_URL+(user?.photo.url??'/api/assets/image-not-found.png')} className="" alt=""/>
+                        <Image width={50} height={50} src={process.env.NEXT_PUBLIC_SERVER_HOST_URL+(user?.photo.url??'/api/assets/image-not-found.png')} className="" alt=""/>
                     </div>
                     <div className='ms-3'>
                         <b>{user?.name??'Unknown'}</b>

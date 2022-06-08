@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {webSocketConnection} from "../tools";
 
-const WebSocket = ({subscribes=[], errorCallback, headers={}, props}) => {
+const WebSocket = ({subscribes=[], errorCallback, headers={}, props, afterConnect=()=>{}}) => {
     const [stomp, setStomp]=useState(null)
     const [subscriptions, setSubscriptions]=useState({})
 
@@ -17,7 +17,7 @@ const WebSocket = ({subscribes=[], errorCallback, headers={}, props}) => {
         }
     }
     useEffect(()=>{
-        webSocketConnection(errorCallback, headers).then(stomp => {
+        webSocketConnection(errorCallback, headers, afterConnect).then(stomp => {
             setStomp(stomp)
             if(stomp.connected){
                subscribe(stomp)

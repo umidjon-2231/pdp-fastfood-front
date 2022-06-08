@@ -1,7 +1,6 @@
 import React, {useCallback, useDebugValue, useEffect, useState} from 'react';
 import Navbar from "../components/Navbar";
 import {checkToken, getToken, parseTime, webSocketConnection} from "../tools";
-import * as process from "../next.config";
 import {toast} from "react-toastify";
 import {ORDER_STATUS} from "../constants";
 import {useRouter} from "next/router";
@@ -41,7 +40,7 @@ const Orders = ({user}) => {
 
     async function getAllOrders() {
         setLoading(true)
-        const req = await fetch(process.env.SERVER_URL + 'order?desc=true&page=0&size=20', {
+        const req = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order?desc=true&page=0&size=20', {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + getToken()
@@ -63,7 +62,7 @@ const Orders = ({user}) => {
     async function getOrderByStatus(status) {
         setLoading(true)
         try {
-            const req = await fetch(process.env.SERVER_URL + 'order?page=0&size=20&desc=true&status=' + status, {
+            const req = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order?page=0&size=20&desc=true&status=' + status, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + getToken()
@@ -194,7 +193,7 @@ const Orders = ({user}) => {
                                     <div className='order-id'>
                                         {item.id}
                                     </div>
-                                    <hr/>
+                                    {horizontal?<hr/>:''}
                                     <div className='order-time'>
                                         <img src="/icons/clock.png" className='me-2' alt="clock"
                                              width={16}/>
@@ -206,7 +205,7 @@ const Orders = ({user}) => {
                                         <div>
                                             <img src="/icons/user.png" alt="" width={16}/>
                                         </div>
-                                        <b className='ms-2'>
+                                        <b className='ms-3'>
                                             {item.client.name}
                                         </b>
                                     </div>
@@ -214,24 +213,22 @@ const Orders = ({user}) => {
                                         <div>
                                             <img src="/icons/telephone.png" style={{opacity: 0.5}} alt="" width={16}/>
                                         </div>
-                                        <p className='ms-2 mb-0'>
+                                        <p className='ms-3 mb-0'>
                                             {item.client.number}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="order-amount size-14">
-                                    <div className="d-flex align-items-center mt-2">
+                                    <div className={`${horizontal?'d-flex':'d-none'} align-items-center mt-2`}>
                                         <div>
                                             <img src="/icons/clipboard.png" alt="" width={16}/>
                                         </div>
                                         <div className='ms-2'>
                                             <p className='mb-0'>{item.amount - item.delivery.price} UZS</p>
                                         </div>
-                                        <div className='ms-3'>
-                                            <b className='mb-0 ms-2 payType'>{item.payType}</b>
-                                        </div>
+
                                     </div>
-                                    <div className="d-flex align-items-center mt-2">
+                                    <div className={`${horizontal?'d-flex':'d-none'} align-items-center mt-2`}>
                                         <div>
                                             <img src="/icons/truck.png" alt="" width={16}/>
                                         </div>
@@ -240,6 +237,10 @@ const Orders = ({user}) => {
                                         </div>
                                     </div>
                                     <div className='mt-2'>
+                                        <div className={`payType-box`}>
+                                            <b className='mb-0 ms-2 payType'>{item.payType}</b>
+                                        </div>
+
                                         <p className='size-12 mb-0 text-muted'>Umumiy summa</p>
                                         <p className='size-20 mb-0'><b>{item.amount}</b> UZS</p>
                                     </div>
