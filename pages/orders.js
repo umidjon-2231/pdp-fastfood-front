@@ -40,7 +40,7 @@ const Orders = ({user}) => {
 
     async function getAllOrders() {
         setLoading(true)
-        const req = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order?desc=true&page=0&size=20', {
+        const req = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order/today?desc=true&page=0&size=20', {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + getToken()
@@ -98,6 +98,75 @@ const Orders = ({user}) => {
         } else {
             await getAllOrders()
         }
+    }
+
+
+    function parseOrder(item, index) {
+        return(
+            <div key={index} className={`mb-2 order-${horizontal ? 'horizontal' : 'vertical'}`}>
+                <div className={'order-head'}>
+                    <div className='order-id'>
+                        {item.id}
+                    </div>
+                    {horizontal?<hr/>:''}
+                    <div className='order-time'>
+                        <img src="/icons/clock.png" className='me-2' alt="clock"
+                             width={16}/>
+                        {parseTime(item.time).toLocaleTimeString().slice(0, 5)}
+                    </div>
+                </div>
+                <div className='order-client'>
+                    <div className='d-flex align-items-center mt-2'>
+                        <div>
+                            <img src="/icons/user.png" alt="" width={16}/>
+                        </div>
+                        <b className='ms-3'>
+                            {item.client.name}
+                        </b>
+                    </div>
+                    <div className='d-flex align-items-center mt-3'>
+                        <div>
+                            <img src="/icons/telephone.png" style={{opacity: 0.5}} alt="" width={16}/>
+                        </div>
+                        <p className='ms-3 mb-0'>
+                            {item.client.number}
+                        </p>
+                    </div>
+                </div>
+                <div className="order-amount size-14">
+                    <div className={`${horizontal?'d-flex':'d-none'} align-items-center mt-2`}>
+                        <div>
+                            <img src="/icons/clipboard.png" alt="" width={16}/>
+                        </div>
+                        <div className='ms-2'>
+                            <p className='mb-0'>{item.amount - item.delivery.price} UZS</p>
+                        </div>
+
+                    </div>
+                    <div className={`${horizontal?'d-flex':'d-none'} align-items-center mt-2`}>
+                        <div>
+                            <img src="/icons/truck.png" alt="" width={16}/>
+                        </div>
+                        <div className='ms-2'>
+                            <p className='mb-0'>{item.delivery.price} UZS</p>
+                        </div>
+                    </div>
+                    <div className='mt-2'>
+                        <div className={`payType-box`}>
+                            <b className='mb-0 ms-2 payType'>{item.payType}</b>
+                        </div>
+
+                        <p className='size-12 mb-0 text-muted'>Umumiy summa</p>
+                        <p className='size-20 mb-0'><b>{item.amount}</b> UZS</p>
+                    </div>
+                </div>
+                <div className="order-position">
+                    <p className='text-muted mb-0 size-12'>Filial:</p>
+                    <p className='mb-0'>{item.filial.nameUz}</p>
+                    <p className='mb-0'>{item.filial.address}</p>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -186,73 +255,11 @@ const Orders = ({user}) => {
                     </div>
                 </div>
                 <div className="py-3 px-4 body" style={{height: 'calc(100vh - 80px)'}}>
-                    {orders?.map((item, index) => {
-                        return (
-                            <div key={index} className={`mb-2 order-${horizontal ? 'horizontal' : 'vertical'}`}>
-                                <div className={'order-head'}>
-                                    <div className='order-id'>
-                                        {item.id}
-                                    </div>
-                                    {horizontal?<hr/>:''}
-                                    <div className='order-time'>
-                                        <img src="/icons/clock.png" className='me-2' alt="clock"
-                                             width={16}/>
-                                        {parseTime(item.time).toLocaleTimeString().slice(0, 5)}
-                                    </div>
-                                </div>
-                                <div className='order-client'>
-                                    <div className='d-flex align-items-center mt-2'>
-                                        <div>
-                                            <img src="/icons/user.png" alt="" width={16}/>
-                                        </div>
-                                        <b className='ms-3'>
-                                            {item.client.name}
-                                        </b>
-                                    </div>
-                                    <div className='d-flex align-items-center mt-3'>
-                                        <div>
-                                            <img src="/icons/telephone.png" style={{opacity: 0.5}} alt="" width={16}/>
-                                        </div>
-                                        <p className='ms-3 mb-0'>
-                                            {item.client.number}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="order-amount size-14">
-                                    <div className={`${horizontal?'d-flex':'d-none'} align-items-center mt-2`}>
-                                        <div>
-                                            <img src="/icons/clipboard.png" alt="" width={16}/>
-                                        </div>
-                                        <div className='ms-2'>
-                                            <p className='mb-0'>{item.amount - item.delivery.price} UZS</p>
-                                        </div>
-
-                                    </div>
-                                    <div className={`${horizontal?'d-flex':'d-none'} align-items-center mt-2`}>
-                                        <div>
-                                            <img src="/icons/truck.png" alt="" width={16}/>
-                                        </div>
-                                        <div className='ms-2'>
-                                            <p className='mb-0'>{item.delivery.price} UZS</p>
-                                        </div>
-                                    </div>
-                                    <div className='mt-2'>
-                                        <div className={`payType-box`}>
-                                            <b className='mb-0 ms-2 payType'>{item.payType}</b>
-                                        </div>
-
-                                        <p className='size-12 mb-0 text-muted'>Umumiy summa</p>
-                                        <p className='size-20 mb-0'><b>{item.amount}</b> UZS</p>
-                                    </div>
-                                </div>
-                                <div className="order-position">
-                                    <p className='text-muted mb-0 size-12'>Filial:</p>
-                                    <p className='mb-0'>{item.filial.nameUz}</p>
-                                    <p className='mb-0'>{item.filial.address}</p>
-                                </div>
-                            </div>
-                        )
-                    })}
+                    {horizontal?orders?.map((item, index) => {return parseOrder(item, index)}):
+                        orders.map((status, index)=>{
+                            return parseOrder(status, index)
+                        })
+                    }
                     {!orders || orders?.length === 0 ?
                         <div className="d-flex justify-content-center">
                             <div className="no-data">No data</div>

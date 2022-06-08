@@ -1,6 +1,5 @@
 import axios from "axios";
 import {toast} from "react-toastify";
-import {useRefreshRoot} from "next/dist/client/streaming/refresh";
 
 export function setCookie(cname, cvalue, maxAge) {
     const d = new Date();
@@ -75,9 +74,7 @@ export async function checkToken(ctx) {
 }
 
 export function parseTime(time) {
-    let date = new Date(time);
-    date.setHours(date.getHours() + 5)
-    return date
+    return new Date(time)
 }
 
 

@@ -5,6 +5,7 @@ import Loading from "./Loading";
 import Head from "next/head";
 import {setCookie} from "../tools";
 import Title from "./Title";
+import axios from "axios";
 
 const Navbar = ({children, name, user, loader=false}) => {
     const router=useRouter()
@@ -58,7 +59,7 @@ const Navbar = ({children, name, user, loader=false}) => {
         if(!user){
             localStorage.removeItem('token')
             setCookie('token', '', 0)
-            router.push('/')
+            router.push('/').then(()=>{})
             return
         }
         setLoading(false)
