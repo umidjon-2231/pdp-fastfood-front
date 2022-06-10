@@ -2,14 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {useRouter} from "next/router";
 import Image from "next/image";
 import Loading from "./Loading";
-import Head from "next/head";
-import {setCookie} from "../tools";
+import {logout, setCookie} from "../tools";
 import Title from "./Title";
-import axios from "axios";
 
-const Navbar = ({children, name, user, loader=false}) => {
-    const router=useRouter()
-    const menu=[
+const Navbar = ({children, name, user, loader = false}) => {
+    const router = useRouter()
+    const menu = [
         {
             title: 'Buyurtmalar',
             icon: '/icons/check-circle.png',
@@ -53,13 +51,14 @@ const Navbar = ({children, name, user, loader=false}) => {
             name: 'settings'
         }
     ]
-    const [loading, setLoading]=useState(true)
+    const [loading, setLoading] = useState(true)
 
-    useEffect(()=>{
-        if(!user){
+    useEffect(() => {
+        if (!user) {
             localStorage.removeItem('token')
             setCookie('token', '', 0)
-            router.push('/').then(()=>{})
+            router.push('/').then(() => {
+            })
             return
         }
         setLoading(false)
@@ -69,33 +68,50 @@ const Navbar = ({children, name, user, loader=false}) => {
 
     return (
         <div className="full-screen d-flex">
-            <Title name={name.slice(0,1).toUpperCase()+name.slice(1)}/>
+            <Title name={name.slice(0, 1).toUpperCase() + name.slice(1)}/>
             <Loading active={loading} opacity={true}/>
             <div className="left">
                 <div className="header px-3 pt-4 pb-5 d-flex align-items-center">
                     <div className="ava">
-                        <Image width={50} height={50} src={process.env.NEXT_PUBLIC_SERVER_HOST_URL+(user?.photo.url??'/api/assets/image-not-found.png')} className="" alt=""/>
+                        <Image width={50} height={50}
+                               src={process.env.NEXT_PUBLIC_SERVER_HOST_URL + (user?.photo.url ?? '/api/assets/image-not-found.png')}
+                               className="" alt=""/>
                     </div>
                     <div className='ms-3'>
-                        <b>{user?.name??'Unknown'}</b>
+                        <b>{user?.name ?? 'Unknown'}</b>
                     </div>
                 </div>
+
                 <div className="menu">
-                    {menu.map((item, index)=>{
+                    {menu.map((item, index) => {
                         return (
-                            <div onClick={()=>{router.push('/'+item.name)}}
+                            <div onClick={() => {
+                                router.push('/' + item.name)
+                            }}
                                  key={index} className={`item d-flex align-items-center
-                                                ${name===item.name?'active':''} ps-5 py-2`}>
-                                <div className="h-100 d-flex align-items-center">
-                                    <img src={name===item.name?item.activeIcon:item.icon} alt="" width={16}/>
+                                                ${name === item.name ? 'active' : ''} py-2`}>
+                                <div
+                                    className={`h-100 d-flex align-items-center ${name === item.name ? 'icon-bg-tr' : 'icon-bg'}`}>
+                                    <img src={name === item.name ? item.activeIcon : item.icon} alt="" width={16}/>
                                 </div>
                                 <div className="ms-3">
                                     <p className='my-2'>{item.title}</p>
                                 </div>
-
                             </div>
                         )
                     })}
+                </div>
+
+                <div className="logout">
+                    <div className="d-flex" onClick={logout} style={{cursor: 'pointer'}}>
+                        <div className="icon-bg me-2">
+                            <img src="/icons/log-out.png" style={{verticalAlign: 'baseline'}} alt="logout-icon"/>
+                        </div>
+                        <div className='d-flex align-items-center'>
+                            <p className="mb-0">Chiqish</p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div className="main position-relative">

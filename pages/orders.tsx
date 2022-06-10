@@ -1,10 +1,13 @@
-import React, {useCallback, useDebugValue, useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import Navbar from "../components/Navbar";
-import {checkToken, getToken, parseTime, webSocketConnection} from "../tools";
+import {checkToken, getToken, parseTime} from "../tools";
 import {toast} from "react-toastify";
-import {ORDER_STATUS} from "../constants";
+import {ORDER_STATUS} from "../enums";
 import {useRouter} from "next/router";
-import WebSocket from "../components/WebSocket";
+import WebSocket, {WebSocketResponse} from "../components/WebSocket";
+import {Response as UpdateOrderResponse} from "../models/websocket/response/UpdateOrder";
+import {Order} from "../models/entity/Order";
+import MainModal from "../components/MainModal";
 
 
 const Orders = ({user}) => {
@@ -13,24 +16,18 @@ const Orders = ({user}) => {
     const [activeStatus, setActiveStatus] = useState(ORDER_STATUS.NEW)
     const [horizontal, setHorizontal] = useState(true)
     const [update, setUpdate] = useState(false)
-    useDebugValue(horizontal?"Horizontal":"Vertical")
+    const [modal, setModal] = useState(false)
     const router = useRouter()
-    useEffect(() => {
-        getOrderByStatus(activeStatus).catch((e) => {
-            console.log(e)
-        })
-    }, [])
-
 
     useEffect(() => {
-        changeOrderPosition(horizontal).then(() => {
+        changeOrderPosition(horizontal, activeStatus).then(() => {
             console.log("Order list updated")
         })
     }, [update])
 
 
 
-    function errorConnectionToast() {
+    function errorConnectionToast() :void{
         if (!toast.isActive("error_connection")) {
             toast.error("Something went wrong. Try to reload page or check your internet connection", {
                 toastId: "error_connection"
@@ -38,31 +35,36 @@ const Orders = ({user}) => {
         }
     }
 
-    async function getAllOrders() {
+    async function getAllOrders(): Promise<void> {
         setLoading(true)
-        const req = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order/today?desc=true&page=0&size=20', {
+        const req: Response | void = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order?desc=true&page=0&size=20', {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + getToken()
             }
-        })
-        if (req.status === 200) {
-            const data = await req.json()
-            setOrders(data)
-            console.log("Success get all orders")
-        } else if (req.status === 403) {
-            toast.warn("Your token expired")
-            await router.push("/")
-        } else {
+        }).catch(()=>{})
+        if(req){
+            if (req.status === 200) {
+                const data = await req.json()
+                setOrders(data)
+                console.log("Success get all orders")
+            } else if (req.status === 403) {
+                toast.warn("Your token expired")
+                await router.push("/")
+            }else {
+                errorConnectionToast()
+            }
+        }
+        else {
             errorConnectionToast()
         }
         setLoading(false)
     }
 
-    async function getOrderByStatus(status) {
+    async function getOrderByStatus(status): Promise<void> {
         setLoading(true)
         try {
-            const req = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order?page=0&size=20&desc=true&status=' + status, {
+            const req: Response | void = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + 'order?page=0&size=20&desc=true&status=' + status, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + getToken()
@@ -76,23 +78,22 @@ const Orders = ({user}) => {
                 toast.warn("Your token expired")
                 await router.push("/")
             } else {
-                toast.error("Something went wrong. Try to reload page or check your internet connection")
+                errorConnectionToast()
             }
         } catch (e) {
-            toast.error("Something went wrong. Try to reload page or check your internet connection")
-
+            errorConnectionToast()
         }
-
         setLoading(false)
     }
 
-    async function changeActiveStatus(status) {
+    async function changeActiveStatus(status): Promise<void> {
         setActiveStatus(status)
         await getOrderByStatus(status)
     }
 
-    async function changeOrderPosition(isHorizontal = true, status=activeStatus) {
+    async function changeOrderPosition(isHorizontal: boolean = true, status: ORDER_STATUS=activeStatus): Promise<void> {
         setHorizontal(isHorizontal)
+        setOrders([])
         if (isHorizontal) {
             await changeActiveStatus(status)
         } else {
@@ -101,7 +102,7 @@ const Orders = ({user}) => {
     }
 
 
-    function parseOrder(item, index) {
+    function parseOrder(item: Order, index: number) {
         return(
             <div key={index} className={`mb-2 order-${horizontal ? 'horizontal' : 'vertical'}`}>
                 <div className={'order-head'}>
@@ -169,6 +170,15 @@ const Orders = ({user}) => {
         )
     }
 
+    function toggleModal(active: boolean){
+        setModal(active)
+    }
+
+    type OrdersWebSocketProps={
+        horizontal: boolean,
+        activeStatus: ORDER_STATUS
+    }
+
     return (
         <Navbar loader={loading} name="orders" user={user}>
             <WebSocket errorCallback={errorConnectionToast}
@@ -176,8 +186,8 @@ const Orders = ({user}) => {
                        subscribes={[
                            {
                                url: "/update/order",
-                               callback: (res, props)=>{
-                                   let body=JSON.parse(res.body)
+                               callback: (res: WebSocketResponse, props: OrdersWebSocketProps)=>{
+                                   let body: UpdateOrderResponse=JSON.parse(res.body)
                                    if(body?.type==='CREATE'){
                                        if(body.status!==props.activeStatus){
                                            return;
@@ -187,21 +197,32 @@ const Orders = ({user}) => {
                                            return
                                        }
                                    }
-                                   changeOrderPosition(props.horizontal, props.activeStatus)
+                                   setUpdate(b=>!b)
 
                                }}
                        ]}
             />
-            <div className="ps-1">
+            <MainModal loading={false} maxWidth={false} toggle={toggleModal} isActive={modal}>
+                <div>
+                    Salom
+                </div>
+            </MainModal>
+            <div className="" style={{paddingLeft: 2}}>
                 <div className='top-nav d-flex align-items-center'>
                     <div className='bg-white d-flex align-items-center px-4 py-3'
-                         style={{minWidth: '200px', height: '80px'}}>
+                         style={{minWidth: '200px', height: '80px', cursor: 'pointer'}}
+                         onClick={()=>{toggleModal(true)}}
+                    >
                         <div>
                             <div className="plus"/>
                         </div>
                         <p className="mb-0 size-12 ms-2">Yangi buyurtma qo’shish</p>
                     </div>
-                    <div className="bg-white w-100 d-flex align-items-center mx-1 px-5 py-2" style={{height: 80}}>
+                    <div className="bg-white w-100 d-flex align-items-center px-5 py-2" style={{
+                        height: 80,
+                        marginLeft: 2,
+                        marginRight: 2
+                    }}>
                         <div className={`scroll-nav ${!horizontal ? 'disabled' : ''}`}>
                             <div onClick={() => {
                                 changeActiveStatus(ORDER_STATUS.NEW)
@@ -231,7 +252,9 @@ const Orders = ({user}) => {
                     </div>
                     <div className="bg-white d-flex align-items-center px-4" style={{height: 80}}>
                         <div className="scroll-nav">
-                            <div onClick={changeOrderPosition}
+                            <div onClick={()=>{
+                                changeOrderPosition()
+                            }}
                                  className={`item d-flex align-items-center ${horizontal ? 'active' : ''}`}>
                                 <div style={{padding: '0 3px'}}>
                                     <div style={{width: 14}} className='rectangle'/>
@@ -254,8 +277,13 @@ const Orders = ({user}) => {
                         </div>
                     </div>
                 </div>
-                <div className="py-3 px-4 body" style={{height: 'calc(100vh - 80px)'}}>
-                    {horizontal?orders?.map((item, index) => {return parseOrder(item, index)}):
+
+                <div className={`py-3 px-4 body`} style={{
+                    height: 'calc(100vh - 80px)',
+                    opacity: modal?0.2:1,
+                    overflowY: modal?'hidden':'auto'
+                }}>
+                    {horizontal?orders?.map((item: Order, index: number) => {return parseOrder(item, index)}):
                         orders.map((status, index)=>{
                             return parseOrder(status, index)
                         })

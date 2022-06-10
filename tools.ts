@@ -1,8 +1,9 @@
 import axios from "axios";
 import {toast} from "react-toastify";
+import {NextPageContext} from "next";
 
-export function setCookie(cname, cvalue, maxAge) {
-    const d = new Date();
+export function setCookie(cname: string, cvalue: string, maxAge: number): void {
+    const d: Date = new Date();
     d.setTime(d.getTime() + (maxAge * 1000));
     let expires = "expires=" + d.toUTCString();
     if (maxAge === 0) {
@@ -11,7 +12,7 @@ export function setCookie(cname, cvalue, maxAge) {
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-export function getCookie(cname) {
+export function getCookie(cname): string | null {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
@@ -27,15 +28,15 @@ export function getCookie(cname) {
     return null;
 }
 
-export function getToken() {
+export function getToken(): string {
     return localStorage?.getItem("token") ?? getCookie("token") ?? ""
 }
 
-export async function checkToken(ctx) {
+export async function checkToken(ctx: NextPageContext): Promise<{ success: boolean, props?: object }> {
     try {
         let token = ''
         if (ctx.req) {
-            token = ctx.req.cookies?.token
+            token = ctx.req['cookies'].token
         } else {
             token = localStorage?.getItem("token")
             if (token === null) {
@@ -67,48 +68,60 @@ export async function checkToken(ctx) {
     if (ctx.req) {
         ctx.res.writeHead(302, {Location: '/'}).end()
     } else {
-        window.location = '/'
+        window.location.href = '/'
     }
 
     return {success: false}
 }
 
-export function parseTime(time) {
+export function parseTime(time: string): Date {
     return new Date(time)
 }
 
 
-function sleep(ms) {
+export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function webSocketConnection(errorCallback=()=>{
+export async function webSocketConnection(errorCallback = () => {
     if (toast.isActive("websocket_default_error")) {
         toast.error("Error websocket connection! Try to reload page", {
             toastId: "websocket_default_error"
         })
     }
-}, headers = {}, afterConnect=()=>{}) {
+}, headers: object = {}, afterConnect = () => {
+}) {
+    // @ts-ignore
     let socket = new SockJS(process.env.NEXT_PUBLIC_SERVER_URL + 'ws');
+    // @ts-ignore
     const stompClient = Stomp.over(socket)
-    let error=false
+    let error = false
     if (process.env.NODE_ENV === "production") {
         stompClient.debug = false
     }
     stompClient.connect({
         Authorization: getToken(),
-        server: "Umidjon",
         ...headers
-    }, afterConnect, (e)=>{
-        error=true
-        if(errorCallback){
+    }, afterConnect, (e) => {
+        error = true
+        if (errorCallback) {
             errorCallback()
         }
 
     })
-    while (!stompClient.connected && !error){
+    while (!stompClient.connected && !error) {
         await sleep(100)
     }
     return stompClient
 
+}
+
+
+
+
+
+export function logout() :void{
+    localStorage.removeItem("token")
+    setCookie("token", "", -1)
+    window.location.href='/'
 }

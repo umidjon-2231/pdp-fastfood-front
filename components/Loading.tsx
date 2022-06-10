@@ -1,8 +1,13 @@
 import React from 'react';
 import {FadeLoader} from "react-spinners";
 import Head from "next/head";
+type Props={
+    active: boolean
+    opacity: boolean
+    fullScreen?: boolean
+}
 
-const Loading = ({active, opacity, fullScreen=true}) => {
+const Loading = ({active, opacity, fullScreen=true}: Props) => {
     if(active){
         return (
             <div className={`${fullScreen?'full-screen':''}
@@ -25,7 +30,7 @@ const Loading = ({active, opacity, fullScreen=true}) => {
             </div>
         );
     }else {
-        return ""
+        return <></>
     }
 
 };
