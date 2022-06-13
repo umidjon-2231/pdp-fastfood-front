@@ -1,12 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import {useRouter} from "next/router";
+import React, {FC, useEffect, useState} from 'react';
+import {NextRouter, useRouter} from "next/router";
 import Image from "next/image";
 import Loading from "./Loading";
 import {logout, setCookie} from "../tools";
 import Title from "./Title";
+import {Human} from "../models/entity/Human";
+import logoutImg from '../public/icons/log-out.png'
 
-const Navbar = ({children, name, user, loader = false}) => {
-    const router = useRouter()
+interface NavbarProps {
+    children: any
+    name: string,
+    user: Human,
+    loader?: boolean
+}
+
+const Navbar: FC<NavbarProps> = ({children, name, user, loader = false}) => {
+    const router: NextRouter = useRouter()
     const menu = [
         {
             title: 'Buyurtmalar',
@@ -83,16 +92,15 @@ const Navbar = ({children, name, user, loader = false}) => {
                 </div>
 
                 <div className="menu">
-                    {menu.map((item, index) => {
+                    {menu.map((item) => {
                         return (
-                            <div onClick={() => {
-                                router.push('/' + item.name)
-                            }}
-                                 key={index} className={`item d-flex align-items-center
+                            <div onClick={() => router.push('/' + item.name)}
+                                 key={Math.random()} className={`item d-flex align-items-center
                                                 ${name === item.name ? 'active' : ''} py-2`}>
                                 <div
                                     className={`h-100 d-flex align-items-center ${name === item.name ? 'icon-bg-tr' : 'icon-bg'}`}>
-                                    <img src={name === item.name ? item.activeIcon : item.icon} alt="" width={16}/>
+                                    <img src={name === item.name ? item.activeIcon : item.icon} alt="" width={16}
+                                         height={16}/>
                                 </div>
                                 <div className="ms-3">
                                     <p className='my-2'>{item.title}</p>
@@ -105,7 +113,7 @@ const Navbar = ({children, name, user, loader = false}) => {
                 <div className="logout">
                     <div className="d-flex" onClick={logout} style={{cursor: 'pointer'}}>
                         <div className="icon-bg me-2">
-                            <img src="/icons/log-out.png" style={{verticalAlign: 'baseline'}} alt="logout-icon"/>
+                            <img src={logoutImg.src} style={{verticalAlign: 'baseline'}} alt="logout-icon"/>
                         </div>
                         <div className='d-flex align-items-center'>
                             <p className="mb-0">Chiqish</p>

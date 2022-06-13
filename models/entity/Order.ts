@@ -28,7 +28,7 @@ export class OrderProduct {
 }
 
 export class Order {
-    private _id: BigInteger;
+    private _id: number;
     private _time: string;
     private _orderStatus: ORDER_STATUS;
     private _client: Human;
@@ -39,7 +39,7 @@ export class Order {
     private _operator: Human | null
     private _products: OrderProduct[]
 
-    get id(): BigInteger {
+    get id(): number {
         return this._id;
     }
 

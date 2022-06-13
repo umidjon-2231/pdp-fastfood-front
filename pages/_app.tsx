@@ -7,7 +7,8 @@ import "../styles/main.scss"
 import {AppProps} from "next/app";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  return(
+
+    return(
       <>
         <Component {...pageProps} />
         <ToastContainer />
@@ -15,4 +16,5 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   )
 
 }
+
 

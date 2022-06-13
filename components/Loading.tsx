@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {FC} from 'react';
 import {FadeLoader} from "react-spinners";
 import Head from "next/head";
 type Props={
@@ -7,7 +7,7 @@ type Props={
     fullScreen?: boolean
 }
 
-const Loading = ({active, opacity, fullScreen=true}: Props) => {
+const Loading: FC<Props> = ({active, opacity, fullScreen=true}) => {
     if(active){
         return (
             <div className={`${fullScreen?'full-screen':''}

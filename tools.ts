@@ -1,6 +1,7 @@
-import axios from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 import {toast} from "react-toastify";
 import {NextPageContext} from "next";
+import {Human} from "./models/entity/Human";
 
 export function setCookie(cname: string, cvalue: string, maxAge: number): void {
     const d: Date = new Date();
@@ -32,9 +33,9 @@ export function getToken(): string {
     return localStorage?.getItem("token") ?? getCookie("token") ?? ""
 }
 
-export async function checkToken(ctx: NextPageContext): Promise<{ success: boolean, props?: object }> {
+export async function checkToken(ctx: NextPageContext): Promise<{ success: boolean, props?: {user: Human, token: string} }> {
     try {
-        let token = ''
+        let token: string;
         if (ctx.req) {
             token = ctx.req['cookies'].token
         } else {
@@ -43,7 +44,7 @@ export async function checkToken(ctx: NextPageContext): Promise<{ success: boole
                 token = getCookie("token")
             }
         }
-        const req = await axios.get(process.env.NEXT_PUBLIC_SERVER_URL + "client/me", {
+        const req = await axios.get<AxiosResponse<Human>>(process.env.NEXT_PUBLIC_SERVER_URL + "client/me", {
             headers: {
                 "Accept": "application/json",
                 "Authorization": 'Bearer ' + token
@@ -59,12 +60,9 @@ export async function checkToken(ctx: NextPageContext): Promise<{ success: boole
                 },
                 success: true
             }
-        } else {
-
         }
 
-    } catch (e) {
-    }
+    } catch (e) {}
     if (ctx.req) {
         ctx.res.writeHead(302, {Location: '/'}).end()
     } else {
