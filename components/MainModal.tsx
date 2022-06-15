@@ -1,31 +1,35 @@
-import React from 'react';
+import React, {FC} from 'react';
 import Loading from "./Loading";
-import {toast} from "react-toastify";
 
-interface Props{
+interface MainModalProps{
     loading: boolean,
     children: JSX.Element
     toggle(active: boolean): void
     isActive: boolean
-    maxWidth?: boolean
+    maxWidth?: boolean,
+    onClose?: ()=>void
 }
 
-const MainModal = ({loading, children, toggle, isActive, maxWidth}: Props) => {
+const MainModal: FC<MainModalProps> = (props) => {
+    function close() {
+        props.toggle(false)
+        if(props.onClose){
+            props.onClose()
+        }
+    }
     return (
-        <div className={`main-modal ${isActive ? 'active' : ''}`}>
-            <div className="main-modal-body" style={{
-                width: maxWidth?'100vw':'0',
-                transition: maxWidth?`right 1s linear`:`right 2s linear`
-            }}>
-                <div className="main-modal-close" onClick={() => {
-                    toggle(false)
-                }}>
+        <div onClick={close} className={`main-modal ${props.isActive ? 'active' : ''}`}>
 
+            <div onClick={(e)=>{e.stopPropagation()}} className="main-modal-body" style={{
+                width: props.maxWidth?'100vw':'0',
+                transition: props.maxWidth?`right 0.5s linear`:`right 1s linear`
+            }}>
+                <div className="main-modal-close" onClick={close}>
                     <img src="/icons/x.png" alt=""/>
                 </div>
-                <Loading active={loading} fullScreen={false} opacity={true}/>
-                <div>
-                    {children}
+                <Loading active={props.loading} fullScreen={false} opacity={true}/>
+                <div className="main-modal-content">
+                    {props.children}
                 </div>
 
             </div>

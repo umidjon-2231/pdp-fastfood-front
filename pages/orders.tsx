@@ -13,6 +13,8 @@ import {NextPage, NextPageContext} from "next";
 import {Human} from "../models/entity/Human";
 import {GroupedData} from "../models/entity/GroupedData";
 import axios, {AxiosResponse} from "axios";
+import {Modal} from "reactstrap";
+import OrderViewCard from "../components/OrderViewCard";
 
 interface OrderProps {
     user: Human,
@@ -26,7 +28,9 @@ const Orders: NextPage<OrderProps> = ({user}) => {
     const [activeStatus, setActiveStatus] = useState<ORDER_STATUS>(ORDER_STATUS.NEW)
     const [horizontal, setHorizontal] = useState<boolean>(true)
     const [update, setUpdate] = useState<boolean>(false)
-    const [modal, setModal] = useState<boolean>(false)
+    const [viewModal, setViewModal] = useState<boolean>(false)
+    const [addModal, setAddModal] = useState<boolean>(false)
+    const [viewItem, setViewItem]=useState<Order | null>(null)
     const router: NextRouter = useRouter()
 
     useEffect(() => {
@@ -101,6 +105,7 @@ const Orders: NextPage<OrderProps> = ({user}) => {
 
     async function changeOrderPosition(isHorizontal: boolean = true, status: ORDER_STATUS = activeStatus): Promise<void> {
         setOrders([])
+        setGroupedOrders([])
         setHorizontal(isHorizontal)
         if (isHorizontal) {
             await changeActiveStatus(status)
@@ -110,8 +115,22 @@ const Orders: NextPage<OrderProps> = ({user}) => {
     }
 
 
-    function toggleModal(active: boolean) {
-        setModal(active)
+    function toggleViewModal(active: boolean) {
+        setViewModal(active)
+    }
+
+    function toggleAddModal(active: boolean) {
+        setAddModal(active)
+    }
+
+    function viewOrder(item: Order):void{
+        setViewItem(item)
+        toggleViewModal(true)
+    }
+
+    function removeViewItem(){
+        setViewItem(null)
+        toggleViewModal(false)
     }
 
     type OrdersWebSocketProps = {
@@ -143,7 +162,14 @@ const Orders: NextPage<OrderProps> = ({user}) => {
                            }
                        ]}
             />
-            <MainModal loading={false} maxWidth={false} toggle={toggleModal} isActive={modal}>
+            <Modal/>
+            <MainModal loading={false}
+                       maxWidth={false}
+                       onClose={removeViewItem}
+                       toggle={toggleViewModal} isActive={viewModal}>
+                <OrderViewCard item={viewItem}/>
+            </MainModal>
+            <MainModal loading={false} maxWidth={true} toggle={toggleAddModal} isActive={addModal}>
                 <div>
                     Salom
                 </div>
@@ -152,7 +178,7 @@ const Orders: NextPage<OrderProps> = ({user}) => {
                 <div className='top-nav d-flex align-items-center'>
                     <div className='bg-white d-flex align-items-center px-4 py-3'
                          style={{minWidth: '200px', height: '80px', cursor: 'pointer'}}
-                         onClick={() => toggleModal(true)}
+                         onClick={() => toggleAddModal(true)}
                     >
                         <div>
                             <div className="plus"/>
@@ -210,12 +236,12 @@ const Orders: NextPage<OrderProps> = ({user}) => {
 
                 <div className={`py-3 px-4 body ${horizontal?"":'row m-0'}`} style={{
                     height: 'calc(100vh - 80px)',
-                    opacity: modal ? 0.2 : 1,
-                    overflowY: modal ? 'hidden' : 'auto'
+                    opacity: viewModal || addModal ? 0.2 : 1,
+                    overflowY: viewModal || addModal ? 'hidden' : 'auto'
                 }}>
                     {horizontal ? orders?.map((item, index) =>{
                         return(
-                            <OrderCard key={item.id} isHorizontal={true} index={index} item={item}/>
+                            <OrderCard view={viewOrder} key={item.id} isHorizontal={true} index={index} item={item}/>
                         )
                         }
                            ) :
@@ -227,7 +253,7 @@ const Orders: NextPage<OrderProps> = ({user}) => {
                                     </div>
                                     {groupedData.content.map((item, indexItem)=>{
                                         return(
-                                            <OrderCard key={item.id} isHorizontal={false} index={indexItem} item={item}/>
+                                            <OrderCard view={viewOrder} key={item.id} isHorizontal={false} index={indexItem} item={item}/>
                                         )
                                     })}
                                     {groupedData.content.length===0 &&

@@ -185,14 +185,20 @@ input:-webkit-autofill {
 }
 
 .order-horizontal{
+  cursor: pointer;
   background: white;
   border-radius: 6px;
   padding: 20px 36px;
   transition: all ease-in 0.5s;
   display: flex;
+  position: relative;
+  height: 150px;
+  width: 964px;
+
   .order-head{
     border-right: 2px solid #EDEFF3;
-    padding-right: 80px;
+    padding-right: 60px;
+    padding-left: 20px;
   }
 
   .order-amount{
@@ -209,19 +215,38 @@ input:-webkit-autofill {
     padding: 0 34px;
     border-right: 2px solid #EDEFF3;
   }
+
   .order-position{
     padding: 0 34px;
   }
+
+  .order-control{
+    .accept, .not-accept{
+      position: absolute;
+      right: -25px;
+      z-index: 1;
+    }
+    .not-accept{
+      top: 20px
+    }
+    .accept{
+      bottom: 20px
+    }
+  }
+
   &:hover{
     box-shadow: 0 20px 25px rgba(176, 177, 181, 0.432802);
   }
 
 }
 .order-vertical{
+  cursor: pointer;
   background: white;
   border-radius: 6px;
   padding: 18px 16px;
   transition: all ease-in 0.5s;
+  position: relative;
+
   .order-head{
     border-bottom: 2px solid #EDEFF3;
     padding-bottom: 20px;
@@ -239,7 +264,6 @@ input:-webkit-autofill {
   }
 
   .order-amount{
-    //padding: 34px 0;
     padding-bottom: 20px;
     border-bottom: 2px solid #EDEFF3;
     position: relative;
@@ -252,14 +276,107 @@ input:-webkit-autofill {
   .order-client{
     padding: 17px 0;
   }
+
   .order-position{
     padding: 13px 0;
   }
+
+  .order-control{
+    .accept, .not-accept{
+      position: absolute;
+      right: 16px;
+      z-index: 1;
+    }
+    .not-accept{
+      bottom: 80px
+    }
+    .accept{
+      bottom: 20px
+    }
+  }
+
   &:hover{
     box-shadow: 0 20px 25px rgba(176, 177, 181, 0.432802);
   }
 
 }
+
+.order-view{
+  transition: all ease-in 0.5s;
+
+  .order-head{
+    padding-bottom: 20px;
+    display: flex;
+    justify-content: space-between
+  }
+
+  .order-client{
+    padding: 20px;
+    background-color: #EDEFF3;
+    border-radius: 6px;
+  }
+
+  .order-position{
+    padding: 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #EAEAEA;
+  }
+
+  .order-products{
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 40px 0;
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    table{
+      thead{
+        background: #F9FAFB;
+        font-size: 10px;
+        color: #8D9BA8;
+      }
+      tbody{
+        font-size: 14px;
+        border: none;
+      }
+    }
+  }
+
+  .order-amount{
+    padding: 20px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    background: #EDEFF3;
+    border-radius: 6px;
+    .payType-box{
+      top: 55px;
+      left: calc(50% + 10px);
+    }
+  }
+
+  .order-control{
+    display: flex;
+    margin-top: 50px;
+  }
+
+}
+
 .order-id{
   background: #20D472;
   border-radius: 18px;
@@ -321,14 +438,20 @@ input:-webkit-autofill {
   justify-content: end;
   padding-top: 2px;
   .main-modal-body{
-    min-width: 366px!important;
+    min-width: 382px!important;
     max-width: 65vw!important;
     height: 100%;
     background-color: white;
-    padding: 28px 24px;
+
     position: relative;
     box-shadow: 0 20px 15px rgba(176, 177, 181, 0.551191);
     right: -410px;
+    .main-modal-content{
+      padding: 28px 24px;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+    }
     .main-modal-close{
       background-color: white;
       position: absolute;
@@ -353,6 +476,50 @@ input:-webkit-autofill {
       right: 0;
     }
     z-index: 2;
+  }
+}
+
+.not-accept{
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 5px;
+  background: #EDEFF3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  div{
+    background-color: white;
+    padding: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+.accept{
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 5px;
+  background: #EDEFF3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  div{
+    background-color: white;
+    padding: 15px;
+    border-radius: 50%;
+    max-width: 40px;
+    min-width: 40px;
+    max-height: 40px;
+    min-height: 40px;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
   }
 }
 

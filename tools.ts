@@ -76,7 +76,6 @@ export function parseTime(time: string): Date {
     return new Date(time)
 }
 
-
 export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -87,8 +86,7 @@ export async function webSocketConnection(errorCallback = () => {
             toastId: "websocket_default_error"
         })
     }
-}, headers: object = {}, afterConnect = () => {
-}) {
+}, headers: object = {}, afterConnect = () => {}) {
     // @ts-ignore
     let socket = new SockJS(process.env.NEXT_PUBLIC_SERVER_URL + 'ws');
     // @ts-ignore
@@ -114,12 +112,21 @@ export async function webSocketConnection(errorCallback = () => {
 
 }
 
-
-
-
-
 export function logout() :void{
     localStorage.removeItem("token")
     setCookie("token", "", -1)
     window.location.href='/'
+}
+
+export function addCommaToNumber(n: number): string {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function addLine(text:string, size: number):string {
+    let result:string='';
+    for (let i = 0; i < text.length / size; i++) {
+        let find = text.slice(i, i + size)
+        result+=find+"\n"
+    }
+    return result
 }

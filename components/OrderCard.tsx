@@ -12,11 +12,12 @@ interface OrderCardProps {
     isHorizontal: boolean
     index: number
     item: Order
+    view: (order: Order)=>void
 }
 
-const OrderCard: NextPage<OrderCardProps> = ({isHorizontal, item, index}) => {
+const OrderCard: NextPage<OrderCardProps> = ({isHorizontal, item, view}) => {
     return (
-        <div className={`mb-2 order-${isHorizontal ? 'horizontal' : 'vertical'}`}>
+        <div onClick={()=>{view(item)}} className={`mb-2 order-${isHorizontal ? 'horizontal' : 'vertical'}`}>
                 <div className='order-head'>
                     <div className='order-id'>
                         {item.id}
@@ -74,10 +75,28 @@ const OrderCard: NextPage<OrderCardProps> = ({isHorizontal, item, index}) => {
                     </div>
                 </div>
                 <div className="order-position">
-                    <p className='text-muted mb-0 size-12'>Filial:</p>
-                    <p className='mb-0'>{item.filial.nameUz}</p>
-                    <p className='mb-0'>{item.filial.address}</p>
+                    <div className="">
+                        <p className='text-muted mb-0 size-12'>Operator:</p>
+                        <b className='mb-0'>{item.operator?.name??'Unknown'}</b>
+                    </div>
+                    <div>
+                        <p className='text-muted mb-0 size-12'>Filial:</p>
+                        <b className='mb-0'>{item.filial.nameUz}</b>
+                        <p className='mb-0 text-muted'>{item.filial.address}</p>
+                    </div>
                 </div>
+            <div className="order-control">
+                <div className="not-accept">
+                        <div>
+                            <img src="/icons/x.png" alt="" width={10} height={10}/>
+                        </div>
+                    </div>
+                <div className="accept ms-3">
+                        <div>
+                            <img src="/icons/accept.png" alt="" width={14} height={9.62}/>
+                        </div>
+                    </div>
+            </div>
             </div>
     );
 };
